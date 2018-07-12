@@ -739,12 +739,14 @@ public class GraphQLSchemaGenerator {
         checkForEmptyOrDuplicates("resolver builders", resolverBuilders);
         operationSourceRepository.registerGlobalResolverBuilders(resolverBuilders);
 
-        List<ResolverBuilder> nestedResolverBuilders = Arrays.asList(
-                new AnnotatedResolverBuilder(),
-                new BeanResolverBuilder(basePackages).withJavaDeprecation(javaDeprecationConfig));
-        for (ExtensionProvider<ResolverBuilder> provider : nestedResolverBuilderProviders) {
-            nestedResolverBuilders = provider.getExtensions(configuration, new ExtensionList<>(nestedResolverBuilders));
+        List<ResolverBuilder> nestedResolverBuilders = new ArrayList<>();
+        if(nestedResolverBuilderProviders.isEmpty()){
+            nestedResolverBuilders.add(new AnnotatedResolverBuilder());
+            nestedResolverBuilders.add(new BeanResolverBuilder(basePackages).withJavaDeprecation(javaDeprecationConfig));
         }
+        for (ExtensionProvider<ResolverBuilder> provider : nestedResolverBuilderProviders) {
+                nestedResolverBuilders = provider.getExtensions(configuration, new ExtensionList<>(nestedResolverBuilders));
+         }
         checkForEmptyOrDuplicates("nested resolver builders", nestedResolverBuilders);
         operationSourceRepository.registerGlobalNestedResolverBuilders(nestedResolverBuilders);
 
